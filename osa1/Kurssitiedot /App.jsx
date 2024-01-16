@@ -1,25 +1,25 @@
-import React from 'react';
+import React from 'react'
 
 const Header = (props) => {
   return (
     <div>
       <p>{props.name}</p>
     </div>
-  );
-};
+  )
+}
 
 const Part = (props) => {
-  const { part } = props;
+  const { part } = props
   
   return (
   <div>
     <p>{part.name} {part.exercises}</p>
   </div> 
-  );
-};
+  )
+}
 
 const Content = (props) => {
-  const { parts } = props;
+  const { parts } = props
 
   return (
     <div>
@@ -27,8 +27,8 @@ const Content = (props) => {
         <Part key={index} part={part} />
       ))}
     </div>
-  );
-};
+  )
+}
 
 const Total = (props) => {
   const { parts } = props;
@@ -37,8 +37,8 @@ const Total = (props) => {
     <div>
       <p>Total exercises: {totalExercises}</p>
     </div>
-  );
-};
+  )
+}
 
 const App = () => {
   const course = {
@@ -65,8 +65,8 @@ const App = () => {
       <Content parts={course.parts}/>
       <Total parts={course.parts} />
     </div>
-  );
-};
+  )
+}
 
 export default App;
 
