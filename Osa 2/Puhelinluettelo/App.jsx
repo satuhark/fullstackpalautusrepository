@@ -21,7 +21,7 @@ const App = () => {
     event.preventDefault()
     
     if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook.`);
+      alert(`${newName} is already added to phonebook.`)
       return
     }
     setPersons([...persons, { name: newName, phone: newPhone }])
