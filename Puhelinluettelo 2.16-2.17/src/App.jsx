@@ -3,15 +3,13 @@ import axios from 'axios'
 import Filter from './Filter'
 import AddPerson from './Addperson'
 
-const baseUrl = 'http://localhost:3001/api/persons'
-
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newFilter, setNewFilter] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    axios.get(`${baseUrl}`)
+    axios.get('http://localhost:3001/persons')
     .then((response) => {
       setPersons(response.data)
     })
@@ -25,7 +23,7 @@ const App = () => {
     const deletedPerson = persons.find((person) => person.id === id)
 
     axios
-    .delete(`${baseUrl}/${id}`)
+    .delete(`http://localhost:3001/persons/${id}`)
     .then(() => {
       setPersons(persons.filter((person) => person.id !== id))
       setErrorMessage(`Deleted ${deletedPerson.name}`)
