@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 
+const baseUrl = 'http://localhost:3001/api/persons'
+
 const AddPerson = ({ persons, setPersons }) => {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
@@ -34,10 +36,10 @@ const AddPerson = ({ persons, setPersons }) => {
           
     const personObject = {
       name: newName,
-      phone: newPhone,
+      number: newPhone,
     }
   
-    axios.post(('http://localhost:3001/persons'), personObject).then((response) => {
+    axios.post(baseUrl, personObject).then((response) => {
       setPersons(persons.concat(response.data));
       setNewName('')
       setNewPhone('')

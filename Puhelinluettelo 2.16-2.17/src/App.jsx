@@ -3,13 +3,15 @@ import axios from 'axios'
 import Filter from './Filter'
 import AddPerson from './Addperson'
 
+const baseUrl = 'http://localhost:3001/api/persons'
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newFilter, setNewFilter] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons')
+    axios.get(baseUrl)
     .then((response) => {
       setPersons(response.data)
     })
@@ -23,7 +25,7 @@ const App = () => {
     const deletedPerson = persons.find((person) => person.id === id)
 
     axios
-    .delete(`http://localhost:3001/persons/${id}`)
+    .delete(`${baseUrl}/${id}`)
     .then(() => {
       setPersons(persons.filter((person) => person.id !== id))
       setErrorMessage(`Deleted ${deletedPerson.name}`)
@@ -57,9 +59,9 @@ const App = () => {
       <Filter value={newFilter} onChange={handleFilterChange} />
       <AddPerson addPerson={setErrorMessage} persons={persons} setPersons={setPersons} />
       <h2>Numbers</h2>
-      {filteredPersons.map(({name, phone, id}, index) => (
+      {filteredPersons.map(({name, number, id}, index) => (
         <div key={index}>
-          {name} {phone}
+          {name} {number}
           <button onClick={() => confirmDeletePerson(id, name)}>Delete</button>
         </div>
         ))}
