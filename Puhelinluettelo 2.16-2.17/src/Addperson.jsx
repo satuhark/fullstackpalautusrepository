@@ -7,6 +7,7 @@ const AddPerson = ({ persons, setPersons }) => {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage2, setErrorMessage2] = useState('')
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -18,41 +19,50 @@ const AddPerson = ({ persons, setPersons }) => {
 
   const addPerson = (event) => {
     event.preventDefault()
-
-    if (persons.some((person) => person.name === newName)) {
-        setErrorMessage(`${newName} is already added to the phonebook.`)
-        setTimeout(() => {
-            setErrorMessage('')
-          }, 5000)
-          return
-    }
-
-    else 
-    {
-        setErrorMessage(`Added ${newName}`)
-        setTimeout(() => {
-            setErrorMessage('')
-          }, 5000)
           
     const personObject = {
       name: newName,
       number: newPhone,
     }
   
-    axios.post(baseUrl, personObject).then((response) => {
-      setPersons(persons.concat(response.data));
+    axios
+    .post(baseUrl, personObject)
+    .then((response) => {
+      if (persons.some((person) => person.name === newName)) {
+        setErrorMessage(`${newName} is already added to the phonebook.`)
+        setTimeout(() => {
+            setErrorMessage('')
+          }, 5000)
+        } else {
+        setErrorMessage(`Added ${newName}`)
+        setTimeout(() => {
+            setErrorMessage('')
+          }, 5000)
+        }
+      setPersons(persons.concat(response.data))
       setNewName('')
       setNewPhone('')
     })
-
-}
-  return
+    .catch(error => {
+      if (error.response && error.response.status === 400) {
+        const errorMessage2 = error.response.data.error
+        setErrorMessage2(errorMessage2)
+      } else {
+        console.error('Error adding person:', error)
+        setErrorMessage2('Failed to add person. Please try again.')
+      }
+      setTimeout(() => {
+        setErrorMessage2('')
+      }, 5000)
+    })
   
 }
+
   return (
     <div>
       <h2>add a new</h2>
       {errorMessage && <div className="error2">{errorMessage}</div>}
+      {errorMessage2 && <div className="error">{errorMessage2}</div>}
       <form onSubmit={addPerson}>
         <div>
           Name: <input value={newName} onChange={handleNameChange} />
@@ -67,5 +77,4 @@ const AddPerson = ({ persons, setPersons }) => {
     </div>
   )
 }
-
 export default AddPerson
