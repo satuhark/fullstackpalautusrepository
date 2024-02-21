@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
+import PropTypes from 'prop-types'
 
 const baseUrl = 'http://localhost:3001/api/persons'
 
@@ -79,4 +80,10 @@ const AddPerson = ({ persons, setPersons }) => {
     </div>
   )
 }
+
+AddPerson.propTypes = {
+  persons: PropTypes.array.isRequired,
+  setPersons: PropTypes.func.isRequired
+}
+
 export default AddPerson
