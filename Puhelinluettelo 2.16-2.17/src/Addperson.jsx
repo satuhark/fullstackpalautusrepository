@@ -28,11 +28,13 @@ const AddPerson = ({ persons, setPersons }) => {
     axios
     .post(baseUrl, personObject)
     .then((response) => {
-      if (persons.some((person) => person.name === newName)) {
+      if (persons.some((person) => person.name.toLowerCase() === newName.toLowerCase())) {
         setErrorMessage(`${newName} is already added to the phonebook.`)
         setTimeout(() => {
             setErrorMessage('')
-          }, 5000)
+        }, 5000)
+        return
+        
         } else {
         setErrorMessage(`Added ${newName}`)
         setTimeout(() => {
