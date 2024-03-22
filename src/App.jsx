@@ -2,80 +2,90 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import BlogComponent from './LikeAndDelete'
 import NewUser from './CreateUser'
-import Login from './Login'
+import loginService from './services/login'
+import AddBlog from './AddBlog'
 
-const baseUrl = 'http://localhost:3003/api/blogs'
+axios.defaults.baseURL = 'http://localhost:3003/api'
 
-const AddBlog = () => {
+const Blog = () => {
   const [blogs, setBlogs] = useState([])
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newTitle, setNewTitle] = useState('')
-  const [newUrl, setNewUrl] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
-    axios.get(baseUrl)
-      .then((response) => {
-        console.log('Response data:', response.data)
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/blogs')
         setBlogs(response.data)
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error fetching blogs:', error.message)
-      })
+        setErrorMessage('Failed to fetch blogs')
+      }
+    }
+    fetchData()
   }, [])
 
-  const handleAuthorChange = (event) => {
-    setNewAuthor(event.target.value)
-  }
-  const handleTitleChange = (event) => {
-    setNewTitle(event.target.value)
-  }
-  const handleUrlChange = (event) => {
-    setNewUrl(event.target.value)
-  }
-
-  const addBlog = (event) => {
-    event.preventDefault()
-
-    const blogObject = {
-      author: newAuthor,
-      title: newTitle,
-      url: newUrl,
-      likes: 0,
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
     }
+  }, [])
 
-    axios.post(baseUrl, blogObject)
-      .then((response) => {
-        setBlogs((prevBlogs) => prevBlogs.concat({ ...response.data, liked: false }))
-        setNewAuthor('')
-        setNewTitle('')
-        setNewUrl('')
-      })
-      .catch(() => {
-        setErrorMessage('Blog post was not added')
-        setNewAuthor('')
-        setNewTitle('')
-        setNewUrl('')
-      })
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    try {
+      const user = await loginService.login({ username, password })
+      setUser(user)
+      localStorage.setItem('user', JSON.stringify(user))
+      setUsername('')
+      setPassword('')
+    } catch (exception) {
+      setUsername('')
+      setPassword('')
+      setErrorMessage('wrong username or password')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }}
+
+  const handleLogout = () => {
+    setUser(null)
+    localStorage.removeItem('user')
   }
-      
-      return (
+
+  const loginForm = () => (
+    <form onSubmit={handleLogin}>
       <div>
-        <h2>Add a new blog</h2>
-        <form onSubmit={(event) => addBlog(event)}>
+        Username: <input type="text" value={username} onChange={({ target }) => setUsername(target.value)} autoComplete="username" />
+        Password: <input type="password" value={password} onChange={({ target }) => setPassword(target.value)} autoComplete="current-password" />
+      </div>
+      <button type="submit">Login</button>
+    </form>
+  )
+
+  const logoutButton = () => (
+    <button onClick={handleLogout}>Log out</button>
+  )
+
+  return (
+    <div>
+      <h2>log in to application</h2>
+      {errorMessage && <div className="error">{errorMessage}</div>}
+      {!user && loginForm()}
+      {!user && <NewUser/>}
+      {user && (
         <div>
-          Author: <input value={newAuthor} onChange={handleAuthorChange} />
-          Title: <input value={newTitle} onChange={handleTitleChange} />
-          Url: <input value={newUrl} onChange={handleUrlChange} />
-          <button type="submit">Add</button>
+          <p>{user.username} logged in</p>
+          {logoutButton()}
+          <AddBlog setBlogs={setBlogs} />
+          <BlogComponent blogs={blogs} setBlogs={setBlogs}/>
         </div>
-      </form>
-      {errorMessage}
-      <Login/>
-      <NewUser/>
-      <BlogComponent blogs={blogs} setBlogs={setBlogs}/>
+      )}
     </div>
   )
 }
 
-export default AddBlog
+export default Blog
