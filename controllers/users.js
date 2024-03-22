@@ -1,12 +1,17 @@
+const express = require('express')
+const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 
-usersRouter.get('/', async (request, response) => {
-    const users = await User
-    .find({}).populate('blogs')
-
-  response.send(JSON.stringify(users, 2))
+usersRouter.get('/', async (req, res) => {
+  try {
+    const users = await User.find({})
+    res.json(users)
+  } catch (error) {
+    console.error('Error fetching users:', error.message)
+    res.status(500).json({ error: 'Failed to fetch users' })
+  }
 })
 
 usersRouter.post('/', async (request, response) => {
@@ -17,8 +22,8 @@ usersRouter.post('/', async (request, response) => {
     
       const user = new User({
         username,
-        name,
         passwordHash,
+        name,
       })
     
       const savedUser = await user.save()
